@@ -1,39 +1,38 @@
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { fetchSecureContent } from '../lib/contentService';
 import './MarkdownViewer.css';
 
 interface MarkdownViewerProps {
-  filePath: string;
+  courseSlug: string;
+  chapterId: string;
   title?: string;
 }
 
-export const MarkdownViewer = ({ filePath, title }: MarkdownViewerProps) => {
+export const MarkdownViewer = ({ courseSlug, chapterId, title }: MarkdownViewerProps) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMarkdown = async () => {
+    const loadContent = async () => {
       setLoading(true);
       setError(null);
 
-      try {
-        const response = await fetch(filePath);
-        if (!response.ok) {
-          throw new Error(`Failed to load: ${response.status}`);
-        }
-        const text = await response.text();
-        setContent(text);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load content');
-      } finally {
-        setLoading(false);
+      const result = await fetchSecureContent(courseSlug, chapterId);
+
+      if (result.error) {
+        setError(result.error);
+      } else if (result.content) {
+        setContent(result.content);
       }
+
+      setLoading(false);
     };
 
-    fetchMarkdown();
-  }, [filePath]);
+    loadContent();
+  }, [courseSlug, chapterId]);
 
   if (loading) {
     return (
@@ -52,6 +51,11 @@ export const MarkdownViewer = ({ filePath, title }: MarkdownViewerProps) => {
         <div className="error-message">
           <h2>コンテンツを読み込めませんでした</h2>
           <p>{error}</p>
+          {error.includes('登録が必要') && (
+            <a href="/courses" className="enroll-link">
+              コースに登録する
+            </a>
+          )}
         </div>
       </div>
     );

@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { MarkdownViewer } from '../components/MarkdownViewer';
 import { QuizModal } from '../components/QuizModal';
 import { NotesPanel } from '../components/NotesPanel';
-import { getDocById, getNextDoc } from '../data/curriculum';
+import { getDocById, getNextDoc, DEFAULT_COURSE_SLUG } from '../data/curriculum';
 import { QuizService } from '../services/quizService';
 import { useProgress } from '../hooks/useProgress';
 import type { Quiz } from '../data/quiz.types';
@@ -79,7 +79,11 @@ export const DocPage = () => {
         )}
       </div>
 
-      <MarkdownViewer filePath={doc.path} title={doc.title} />
+      <MarkdownViewer
+        courseSlug={doc.courseSlug || DEFAULT_COURSE_SLUG}
+        chapterId={doc.id}
+        title={doc.title}
+      />
 
       {!loadingQuiz && quiz && (
         <div className="quiz-section">
