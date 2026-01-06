@@ -6,13 +6,14 @@ import './QuizModal.css';
 
 interface QuizModalProps {
   quiz: Quiz;
+  chapterId?: string;
   nextDoc?: DocItem;
   isOpen: boolean;
   onClose: () => void;
   onComplete?: (passed: boolean) => void;
 }
 
-export function QuizModal({ quiz, nextDoc, isOpen, onClose, onComplete }: QuizModalProps) {
+export function QuizModal({ quiz, chapterId, nextDoc, isOpen, onClose, onComplete }: QuizModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -49,7 +50,7 @@ export function QuizModal({ quiz, nextDoc, isOpen, onClose, onComplete }: QuizMo
         <button className="quiz-modal-close" onClick={onClose} aria-label="閉じる">
           &times;
         </button>
-        <QuizPlayer quiz={quiz} nextDoc={nextDoc} onComplete={onComplete} onClose={onClose} />
+        <QuizPlayer quiz={quiz} chapterId={chapterId} nextDoc={nextDoc} onComplete={onComplete} onClose={onClose} />
       </div>
     </div>
   );

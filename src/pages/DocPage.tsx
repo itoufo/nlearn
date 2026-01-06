@@ -105,6 +105,7 @@ export const DocPage = () => {
       {quiz && (
         <QuizModal
           quiz={quiz}
+          chapterId={docId}
           nextDoc={nextDoc}
           isOpen={isQuizOpen}
           onClose={() => setIsQuizOpen(false)}

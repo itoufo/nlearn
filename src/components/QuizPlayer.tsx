@@ -1,26 +1,37 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Quiz, QuizQuestion, QuizAnswer, QuizResult } from '../data/quiz.types';
 import type { DocItem } from '../data/curriculum';
+import { useQuizSubmit } from '../hooks/useQuizSubmit';
+import { useAuth } from '../contexts/AuthContext';
 import './QuizPlayer.css';
 
 const PASS_THRESHOLD = 80; // 合格ライン（%）
 
 interface QuizPlayerProps {
   quiz: Quiz;
+  chapterId?: string;
   nextDoc?: DocItem;
   onComplete?: (passed: boolean) => void;
   onClose?: () => void;
 }
 
-export function QuizPlayer({ quiz, nextDoc, onComplete, onClose }: QuizPlayerProps) {
+export function QuizPlayer({ quiz, chapterId, nextDoc, onComplete, onClose }: QuizPlayerProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { submitQuiz } = useQuizSubmit();
+  const startTimeRef = useRef<number>(Date.now());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [result, setResult] = useState<QuizResult | null>(null);
+
+  // Reset start time when quiz begins
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+  }, []);
 
   const currentQuestion = quiz.questions[currentIndex];
   const isLastQuestion = currentIndex === quiz.questions.length - 1;
@@ -64,7 +75,7 @@ export function QuizPlayer({ quiz, nextDoc, onComplete, onClose }: QuizPlayerPro
     setShowExplanation(true);
   }, [selectedOptions, currentQuestion, checkAnswer]);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (isLastQuestion) {
       const allAnswers = [...answers];
       const correctCount = allAnswers.filter((a) => a.isCorrect).length;
@@ -79,13 +90,32 @@ export function QuizPlayer({ quiz, nextDoc, onComplete, onClose }: QuizPlayerPro
       setResult(finalResult);
       setIsCompleted(true);
       const isPassed = finalResult.score >= PASS_THRESHOLD;
+
+      // Save quiz result to Supabase if user is logged in
+      if (user && chapterId) {
+        const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        const quizAnswers = allAnswers.map((a, idx) => ({
+          questionId: a.questionId,
+          selectedOption: quiz.questions[idx]?.options.findIndex(
+            opt => a.selectedOptionIds.includes(opt.id)
+          ) ?? 0,
+          isCorrect: a.isCorrect ?? false
+        }));
+
+        try {
+          await submitQuiz(chapterId, quiz.id, quizAnswers, timeTaken);
+        } catch (error) {
+          console.error('Failed to save quiz result:', error);
+        }
+      }
+
       onComplete?.(isPassed);
     } else {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOptions([]);
       setShowExplanation(false);
     }
-  }, [isLastQuestion, answers, quiz, onComplete]);
+  }, [isLastQuestion, answers, quiz, onComplete, user, chapterId, submitQuiz]);
 
   const handleRetry = useCallback(() => {
     setCurrentIndex(0);
