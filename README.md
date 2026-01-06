@@ -1,73 +1,279 @@
-# React + TypeScript + Vite
+# NLearn - 情報商材プラットフォーム
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+NLearnは、デジタルコンテンツ（情報商材）の販売・学習・管理を一元化したオールインワンプラットフォームです。
 
-Currently, two official plugins are available:
+## プラットフォーム概念
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ビジョン
 
-## React Compiler
+**「知識を価値に変え、学びを成果に繋げる」**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+NLearnは単なるeラーニングシステムではなく、コンテンツ制作者と学習者を繋ぐマーケットプレイスとして機能します。
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        NLearn Platform                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────┐      ┌─────────────┐      ┌─────────────┐   │
+│   │   制作者    │      │  プラット   │      │   学習者    │   │
+│   │  Creator    │ ───▶ │   フォーム  │ ◀─── │   Learner   │   │
+│   └─────────────┘      └─────────────┘      └─────────────┘   │
+│         │                     │                     │          │
+│         │  コンテンツ登録     │  学習体験提供       │          │
+│         │  収益化             │  進捗管理           │          │
+│         │  分析レポート       │  決済処理           │          │
+│         │                     │  修了証発行         │          │
+│         ▼                     ▼                     ▼          │
+│   ┌─────────────────────────────────────────────────────────┐  │
+│   │                    管理ダッシュボード                    │  │
+│   │  ユーザー管理 │ コース管理 │ 売上分析 │ 通知管理        │  │
+│   └─────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 3つの柱
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+#### 1. コンテンツマネジメント
+- Markdownベースの教材作成
+- チャプター構成による体系的な学習設計
+- クイズ・テストによる理解度確認
+- 動画・画像・コードブロック対応
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+#### 2. 商取引プラットフォーム
+- Stripe連携による安全な決済
+- 無料/有料コースの柔軟な価格設定
+- プロモーションコード対応
+- 売上レポート・分析
+
+#### 3. 学習エンゲージメント
+- 進捗トラッキング
+- ノート・ブックマーク機能
+- LINE通知によるリマインド
+- 修了証の自動発行
+
+## ユーザーフロー
+
 ```
+┌──────────────────────────────────────────────────────────────────────┐
+│                          学習者ジャーニー                             │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐   │
+│  │ 登録   │──▶│ 発見   │──▶│ 購入   │──▶│ 学習   │──▶│ 修了   │   │
+│  │        │   │        │   │        │   │        │   │        │   │
+│  │・会員  │   │・カタ  │   │・カート│   │・教材  │   │・証明書│   │
+│  │ 登録   │   │ ログ   │   │・決済  │   │ 閲覧   │   │ 発行   │   │
+│  │・LINE  │   │・検索  │   │・登録  │   │・クイズ│   │・共有  │   │
+│  │ 連携   │   │・推薦  │   │ 完了   │   │・ノート│   │        │   │
+│  └────────┘   └────────┘   └────────┘   └────────┘   └────────┘   │
+│       │            │            │            │            │        │
+│       └────────────┴────────────┴────────────┴────────────┘        │
+│                              ↓                                      │
+│                    ┌─────────────────┐                              │
+│                    │  リマインド通知  │                              │
+│                    │  (LINE / Email) │                              │
+│                    └─────────────────┘                              │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+## 機能一覧
+
+### 学習者向け機能
+
+| 機能 | 説明 |
+|------|------|
+| 会員登録/ログイン | Email/パスワード、OAuth (Google) |
+| コースカタログ | カテゴリ別、検索、フィルタリング |
+| コース購入 | Stripe決済、無料コース即時登録 |
+| 学習進捗 | チャプター完了率、学習時間記録 |
+| クイズ | 理解度テスト、合格/不合格判定 |
+| ノート | 章ごとのメモ保存 |
+| ブックマーク | お気に入り登録 |
+| 修了証 | PDF証明書の発行・ダウンロード |
+| LINE連携 | 進捗通知、リマインダー |
+
+### 管理者向け機能
+
+| 機能 | 説明 |
+|------|------|
+| ダッシュボード | KPI、売上、アクティビティ概要 |
+| ユーザー管理 | 一覧、検索、権限変更、停止 |
+| コース管理 | 作成、編集、公開/非公開 |
+| 売上レポート | 期間別、コース別分析 |
+| 修了証承認 | 申請確認、発行管理 |
+
+## 技術アーキテクチャ
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         クライアント                             │
+│  React 19 + TypeScript + Vite                                   │
+│  ├── React Router (SPA ルーティング)                            │
+│  ├── React Hot Toast (通知)                                     │
+│  └── CSS Modules (スタイリング)                                 │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ HTTPS
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         Supabase                                │
+│  ├── PostgreSQL (データベース)                                  │
+│  │   └── nlearn スキーマ (16テーブル + RLS)                    │
+│  ├── Auth (認証・認可)                                         │
+│  │   └── OAuth, Email/Password                                 │
+│  ├── Storage (ファイルストレージ)                              │
+│  │   └── avatars, certificates, course-assets                  │
+│  └── Edge Functions (サーバーレス)                             │
+│      ├── nlearn_create_checkout                                │
+│      ├── nlearn_stripe_webhook                                 │
+│      ├── nlearn_line_webhook                                   │
+│      ├── nlearn_send_reminder                                  │
+│      └── nlearn_generate_certificate                           │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+          ┌─────────────────┼─────────────────┐
+          ▼                 ▼                 ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│     Stripe      │ │   LINE API      │ │   Resend        │
+│  (決済処理)     │ │  (メッセージ)   │ │  (メール送信)   │
+└─────────────────┘ └─────────────────┘ └─────────────────┘
+```
+
+## データモデル
+
+### コアエンティティ
+
+```
+profiles (ユーザー)
+    │
+    ├── enrollments (受講登録)
+    │       │
+    │       └── courses (コース)
+    │               │
+    │               └── chapters (チャプター)
+    │                       │
+    │                       └── quizzes (クイズ)
+    │
+    ├── chapter_progress (進捗)
+    │
+    ├── quiz_attempts (クイズ結果)
+    │
+    ├── notes (ノート)
+    │
+    ├── bookmarks (ブックマーク)
+    │
+    ├── certifications (修了証)
+    │
+    └── notification_settings (通知設定)
+```
+
+## ディレクトリ構成
+
+```
+src/
+├── components/          # 共通UIコンポーネント
+│   ├── Layout.tsx
+│   ├── ProtectedRoute.tsx
+│   ├── QuizPlayer.tsx
+│   └── ...
+├── contexts/           # React Context
+│   └── AuthContext.tsx
+├── hooks/              # カスタムフック
+│   ├── useProgress.ts
+│   ├── useLearningProgress.ts
+│   └── useQuizSubmit.ts
+├── lib/                # ライブラリ設定
+│   └── supabase.ts
+├── pages/              # ページコンポーネント
+│   ├── admin/          # 管理画面
+│   ├── auth/           # 認証
+│   ├── courses/        # コースカタログ
+│   ├── dashboard/      # ダッシュボード
+│   ├── settings/       # 設定
+│   └── ...
+├── types/              # TypeScript型定義
+│   └── database.types.ts
+└── App.tsx             # ルーティング
+
+supabase/
+├── migrations/         # DBマイグレーション
+│   ├── 001_initial_schema.sql
+│   ├── 002_rls_policies.sql
+│   ├── 003_storage_buckets.sql
+│   └── 004_helper_functions.sql
+├── functions/          # Edge Functions
+│   ├── nlearn_create_checkout/
+│   ├── nlearn_stripe_webhook/
+│   ├── nlearn_line_webhook/
+│   ├── nlearn_send_reminder/
+│   └── nlearn_generate_certificate/
+└── seed.sql            # 初期データ
+```
+
+## セットアップ
+
+### 前提条件
+
+- Node.js 18+
+- pnpm / npm / yarn
+- Supabaseアカウント
+- Stripeアカウント
+- LINE Developersアカウント (任意)
+
+### 環境変数
+
+`.env.example` をコピーして `.env` を作成:
+
+```bash
+cp .env.example .env
+```
+
+必要な環境変数:
+
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_STRIPE_PUBLIC_KEY=your-stripe-public-key
+```
+
+### インストール
+
+```bash
+# 依存関係インストール
+npm install
+
+# 開発サーバー起動
+npm run dev
+
+# ビルド
+npm run build
+```
+
+### Supabaseセットアップ
+
+1. Supabaseプロジェクト作成
+2. マイグレーション実行:
+   ```bash
+   supabase db push
+   ```
+3. Edge Functions デプロイ:
+   ```bash
+   supabase functions deploy
+   ```
+
+## デモモード
+
+Supabase未設定の場合、自動的にデモモードで動作します。
+- ローカルストレージに進捗保存
+- モックデータ表示
+- 決済機能は無効
+
+## ライセンス
+
+Private - All Rights Reserved
+
+## 作者
+
+Built with Claude Code
